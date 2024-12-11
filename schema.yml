@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: Gas Station API
+  version: 1.0.0
+  description: Meni ismim API tanishganimdan xursandman.
+paths:
+  /api/v1/gas-station/user/auth/:
+    post:
+      operationId: root_create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SignUpModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SignUpModel'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignUpModel'
+          description: ''
+  /api/v1/gas-station/user/auth/details/:
+    put:
+      operationId: details_update
+      tags:
+      - details
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetailsModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetailsModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetailsModel'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsModel'
+          description: ''
+  /api/v1/gas-station/user/auth/verify/:
+    post:
+      operationId: verify_create
+      tags:
+      - verify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyModel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyModel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyModel'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyModel'
+          description: ''
+components:
+  schemas:
+    SignUpModel:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          pattern: ^\d{9}$
+          maxLength: 9
+      required:
+      - phone_number
+    UserDetailsModel:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+          maxLength: 50
+        number:
+          type: string
+          nullable: true
+          maxLength: 30
+    VerifyModel:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          pattern: ^\d{9}$
+          maxLength: 9
+        code:
+          type: string
+      required:
+      - code
+      - phone_number
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
