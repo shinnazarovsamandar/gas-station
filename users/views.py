@@ -116,6 +116,6 @@ class TokenCreateAPIView(generics.CreateAPIView):
         except TokenError:
             return Response(create_response_body("Invalid refresh token."), status=status.HTTP_400_BAD_REQUEST)
 
-# class SignOutAPIView(generics.CreateAPIView):
-#     permission_classes = ()
+class SignOutAPIView(generics.CreateAPIView):
+    permission_classes = ()
 
