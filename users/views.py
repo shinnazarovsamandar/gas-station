@@ -62,7 +62,7 @@ class VerifyCreateAPIView(generics.CreateAPIView):
         get_key = cache.get(key)
 
         if get_key is None:
-            return Response(create_response_body("Invalid code."))
+            return Response(create_response_body("Invalid code."), status=status.HTTP_400_BAD_REQUEST)
 
         cache.delete(key)
 
