@@ -1,6 +1,9 @@
 from rest_framework import serializers
+
 from .models import UserModel
 from admins.models import GasStationModel
+from .constants import ACTION, CREATE
+
 
 class SignUpModelSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,5 +24,6 @@ class UserDetailsModelSerializer(serializers.ModelSerializer):
 class TokenModelSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 
-
+class PointSerializer(serializers.Serializer):
+    point = serializers.ListField(child=serializers.DecimalField(max_digits=9, decimal_places=6), min_length=2, max_length=2)
 
