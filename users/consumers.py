@@ -80,7 +80,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         gas_stations = GasStationModel.objects.all()
         for gas_station in gas_stations:
             distance = gas_station.point.distance(point)
-            if distance <= Ga
+            # if distance <= Ga
             gas_station.save()
 
 
