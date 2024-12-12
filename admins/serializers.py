@@ -9,7 +9,6 @@ from rest_framework import serializers
 from django.contrib.gis.geos import Point
 
 class GasStationGeoFeatureModelSerializer(GeoFeatureModelListSerializer):
-    point = PointField()
     class Meta:
         model = GasStationModel
         geo_field = 'point'
