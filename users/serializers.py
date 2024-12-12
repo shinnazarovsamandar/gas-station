@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from .models import UserModel
 from admins.models import GasStationModel
-from .constants import ACTION, CREATE
+from .constants import CREATE
 
 
 class SignUpModelSerializer(serializers.ModelSerializer):
