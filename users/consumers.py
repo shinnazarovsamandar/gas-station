@@ -9,6 +9,7 @@ from config.utils import create_response_body
 from .models import  GasStationModel
 from .constants import CREATE
 from .serializers import PointSerializer
+from config.settings import env
 
 class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -80,9 +81,22 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         gas_stations = GasStationModel.objects.all()
         for gas_station in gas_stations:
             distance = gas_station.point.distance(point)
-            # if distance <= Ga
-            gas_station.save()
+            if distance <= env('DISTANCE'):
+                message = {
+                    "action": CREATE,
+                    "data": {
 
+                    }
+                }
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': message
+                    }
+                )
+
+            gas_station.save()
 
 class GasStationAsyncWebsocketConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -144,5 +158,10 @@ class GasStationAsyncWebsocketConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_gas_station(self, id):
+        gas_station = GasStationModel.objects.get(id=id)
+        return gas_station
+
+    @database_sync_to_async
+    def get_users(self, id):
         gas_station = GasStationModel.objects.get(id=id)
         return gas_station
