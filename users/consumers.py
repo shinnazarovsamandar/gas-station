@@ -7,9 +7,10 @@ from django.contrib.gis.geos import Point
 
 from config.utils import create_response_body
 from .models import  GasStationModel, GasStationUserModel
-from .constants import CREATE, UPDATE
+from .constants import CREATE, UPDATE, LIST
 from .serializers import (PointSerializer, UserDetailsModelSerializer,
-                          UserPointModelSerializer, GasStationModelSerializer)
+                          UserPointModelSerializer, GasStationModelSerializer,
+                          GasStationUserModelSerializer)
 from config.settings import env
 
 class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
@@ -29,9 +30,13 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
-
+        data = await self.get_gas_stations()
+        data = {
+            "action": LIST,
+            "gas_station_users": data
+        }
         await self.send(text_data=json.dumps(
-            create_response_body("Gas stations retrieved successfully.", data = {})
+            create_response_body("Gas stations retrieved successfully.", data = data)
         ))
 
     async def disconnect(self, close_code):
@@ -49,7 +54,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             data = text_data_json['data']
             serializer = PointSerializer(data=data)
             if serializer.is_valid():
-                message, data = self.create_point(serializer.data)
+                message, data = await self.create_point(serializer.data)
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
@@ -81,15 +86,16 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             'message': message
         }))
     @database_sync_to_async
-    def create_point(self, point):
-        point = Point(point)
+    def create_point(self, data):
+        point = data['point']
+        point = Point(list(map(float, point)))
         self.user.point = point
         self.user.save()
 
         gas_stations = GasStationModel.objects.all()
         for gas_station in gas_stations:
             distance = gas_station.point.distance(point)
-            if distance <= env('DISTANCE'):
+            if distance <= int(env('DISTANCE')):
                 gas_station_user = self.user.gas_station_users.filter(gas_station=gas_station).first()
                 if gas_station_user is not None:
                     serializer = UserPointModelSerializer(self.user)
@@ -113,7 +119,11 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
 
                 return message, data
 
-
+    @database_sync_to_async
+    def get_gas_stations(self):
+        gas_stations = GasStationModel.objects.all()
+        serializer = GasStationUserModelSerializer(gas_stations, many=True)
+        return serializer.data
 
 # class GasStationAsyncWebsocketConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):

@@ -6,7 +6,7 @@ from config.utils import create_response_body
 
 
 from .models import GasStationModel
-from .serializers import GasStationGeoFeatureModelSerializer, GasStationModelSerializer
+from .serializers import GasStationGeoFeatureModelSerializer
 # Create your views here.
 class GasStationCreateAPIView(generics.CreateAPIView):
     queryset = GasStationModel.objects.all()
@@ -22,7 +22,7 @@ class GasStationCreateAPIView(generics.CreateAPIView):
 
 class GasStationListAPIView(generics.ListAPIView):
     queryset = GasStationModel.objects.all()
-    serializer_class = GasStationModelSerializer
+    serializer_class = GasStationGeoFeatureModelSerializer
     # permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):

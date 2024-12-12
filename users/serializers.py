@@ -34,12 +34,12 @@ class UserPointModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'point']
 
 class GasStationModelSerializer(serializers.ModelSerializer):
-    user = UserPointModelSerializer()
     class Meta:
         model = GasStationModel
         fields = ['id', 'total']
 
 class _GasStationUserModelSerializer(serializers.ModelSerializer):
+    user = UserPointModelSerializer()
     class Meta:
         model = GasStationUserModel
         fields = ['user']
@@ -47,4 +47,4 @@ class GasStationUserModelSerializer(serializers.ModelSerializer):
     gas_station_users = _GasStationUserModelSerializer(many=True)
     class Meta:
         model = GasStationModel
-        fields = ['id', 'name', 'total', 'gas_station_users']
+        fields = ['id', 'name', 'point', 'total', 'gas_station_users']
