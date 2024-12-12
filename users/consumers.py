@@ -33,7 +33,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         data = await self.get_gas_stations()
         data = {
             "action": LIST,
-            "gas_station_users": data
+            "gas_stations": data
         }
         await self.send(text_data=json.dumps(
             create_response_body("Gas stations retrieved successfully.", data = data)
