@@ -105,7 +105,11 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             data = text_data_json['data']
             serializer = GasStationCommentModelSerializer(data=data)
             if serializer.is_valid():
-                message, data = await self.create_comment(serializer.data)
+                try:
+                    message, data = await self.create_comment(serializer.data)
+                except Exception:
+                    await self.close()
+                    return
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {
@@ -183,6 +187,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             "updated_at": updated_at
         }
         return message, data
+    
     @database_sync_to_async
     def get_gas_stations(self):
         gas_stations = GasStationModel.objects.all()

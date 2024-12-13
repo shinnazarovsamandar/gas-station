@@ -50,7 +50,6 @@ class GasStationUserModelSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'point', 'total', 'comment', 'comment_updated_at', 'gas_station_users']
 
 class GasStationCommentModelSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=GasStationModel.objects.all())
     class Meta:
         model = GasStationModel
         fields = ['id', 'comment']
