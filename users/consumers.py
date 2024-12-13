@@ -50,14 +50,14 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             print("HI")
 
             message, data = await self.delete_gas_station_user()
-            
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'chat_message',
-                    'message': create_response_body(message, data)
-                }
-            )
+            if message is not None:
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': create_response_body(message, data)
+                    }
+                )
 
 
 
@@ -184,7 +184,6 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def delete_gas_station_user(self):
         gas_station_user = self.user.gas_station_users.first()
-        print("gas_station_user")
         if gas_station_user:
             gas_station = gas_station_user.gas_station
             gas_station.total-=1
