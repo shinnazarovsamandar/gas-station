@@ -49,7 +49,6 @@ class GasStationUserModelSerializer(serializers.ModelSerializer):
         model = GasStationModel
         fields = ['id', 'name', 'point', 'total', 'comment', 'comment_updated_at', 'gas_station_users']
 
-class GasStationCommentModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GasStationModel
-        fields = ['id', 'comment']
+class GasStationCommentModelSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    comment = serializers.CharField(max_length=255)
