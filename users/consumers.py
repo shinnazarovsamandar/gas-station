@@ -82,9 +82,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         message = event['message']
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+        await self.send(text_data=json.dumps(message))
     @database_sync_to_async
     def create_point(self, data):
         point = data['point']
