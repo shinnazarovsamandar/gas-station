@@ -4,13 +4,15 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from urllib.parse import parse_qs
 from django.contrib.gis.geos import Point
+from django.utils import timezone
+
 
 from config.utils import create_response_body
 from .models import  GasStationModel, GasStationUserModel
-from .constants import CREATE, UPDATE, LIST, DELETE
+from .constants import CREATE, UPDATE, LIST, DELETE, COMMENT
 from .serializers import (PointSerializer, UserDetailsModelSerializer,
                           UserPointModelSerializer, GasStationModelSerializer,
-                          GasStationUserModelSerializer)
+                          GasStationUserModelSerializer, GasStationCommentModelSerializer)
 from config.settings import env
 
 class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
@@ -93,6 +95,19 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             else:
                 await self.close()
                 return
+        elif action == COMMENT:
+            data = text_data_json['data']
+            serializer = GasStationCommentModelSerializer(data=data)
+            if serializer.is_valid():
+                message, data = await self.create_comment(serializer.data)
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'message': create_response_body(message, data)
+                    }
+                )
+
         else:
             await self.close()
             return
@@ -145,6 +160,22 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
 
                 return message, data
         return None, None
+
+    @database_sync_to_async
+    def create_comment(self, data):
+        id = data['id']
+        comment = data['comment']
+        updated_at = timezone.now()
+        gas_station = GasStationModel.objects.get(id=id)
+        gas_station.comment = comment
+        gas_station.comment_updated_at = updated_at
+        gas_station.save()
+        message = "Gas station comment updated successfully."
+        data = {
+            "id": id,
+            'comment': comment
+        }
+        return message, data
     @database_sync_to_async
     def get_gas_stations(self):
         gas_stations = GasStationModel.objects.all()
