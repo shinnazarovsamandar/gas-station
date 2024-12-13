@@ -7,7 +7,7 @@ from django.contrib.gis.geos import Point
 
 from config.utils import create_response_body
 from .models import  GasStationModel, GasStationUserModel
-from .constants import CREATE, UPDATE, LIST
+from .constants import CREATE, UPDATE, LIST, DELETE
 from .serializers import (PointSerializer, UserDetailsModelSerializer,
                           UserPointModelSerializer, GasStationModelSerializer,
                           GasStationUserModelSerializer)
@@ -46,6 +46,28 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
 
+            self.user.gas_station_users.first().delete()
+
+            message = "Gas station user deleted successfully."
+            data = {
+                "action": DELETE,
+                "id": self.user.id
+            }
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': create_response_body(message, data)
+                }
+            )
+
+
+
+
+
+
+
+
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -55,13 +77,14 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             serializer = PointSerializer(data=data)
             if serializer.is_valid():
                 message, data = await self.create_point(serializer.data)
-                await self.channel_layer.group_send(
-                    self.room_group_name,
-                    {
-                        'type': 'chat_message',
-                        'message': create_response_body(message, data)
-                    }
-                )
+                if message is not None:
+                    await self.channel_layer.group_send(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_message',
+                            'message': create_response_body(message, data)
+                        }
+                    )
             else:
                 await self.close()
                 return
@@ -116,7 +139,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                     }
 
                 return message, data
-
+        return None, None
     @database_sync_to_async
     def get_gas_stations(self):
         gas_stations = GasStationModel.objects.all()
