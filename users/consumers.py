@@ -192,10 +192,10 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         data = {
             "action": DELETE,
             "user": {
-                "id": self.user.id
+                "id": str(self.user.id)
             }, 
             "gas_station": {
-                "id": gas_station.id,
+                "id": str(gas_station.id),
                 "total": gas_station.total
             }
         }
