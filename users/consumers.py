@@ -48,24 +48,9 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
             print("HI")
-            gas_station_user = self.user.gas_station_users.first()
-            if gas_station_user:
-                gas_station = gas_station_user.gas_station
-                gas_station.total-=1
-                gas_station.save()
-                gas_station_user.delete()
 
-            message = "Gas station user deleted successfully."
-            data = {
-                "action": DELETE,
-                "user": {
-                    "id": self.user.id
-                }, 
-                "gas_station": {
-                    "id": gas_station.id,
-                    "total": gas_station.total
-                }
-            }
+            message, data = self.delete_gas_station_user()
+            
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -194,6 +179,27 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         serializer = GasStationUserModelSerializer(gas_stations, many=True)
         return serializer.data
 
+    @database_sync_to_async
+    def delete_gas_station_user(self):
+        gas_station_user = self.user.gas_station_users.first()
+        if gas_station_user:
+            gas_station = gas_station_user.gas_station
+            gas_station.total-=1
+            gas_station.save()
+            gas_station_user.delete()
+
+        message = "Gas station user deleted successfully."
+        data = {
+            "action": DELETE,
+            "user": {
+                "id": self.user.id
+            }, 
+            "gas_station": {
+                "id": gas_station.id,
+                "total": gas_station.total
+            }
+        }
+        return message, data
 # class GasStationAsyncWebsocketConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):
 #         self.user = self.scope.get("user")
