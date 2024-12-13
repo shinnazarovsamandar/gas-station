@@ -46,7 +46,12 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
 
-            self.user.gas_station_users.first().delete()
+            gas_station_user = self.user.gas_station_users.first()
+            if gas_station_user:
+                gas_station = gas_station_user.gas_station
+                gas_station.total-=1
+                gas_station.save()
+                gas_station_user.delete()
 
             message = "Gas station user deleted successfully."
             data = {
