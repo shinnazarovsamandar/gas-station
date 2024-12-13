@@ -182,6 +182,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def delete_gas_station_user(self):
         gas_station_user = self.user.gas_station_users.first()
+        print("gas_station_user")
         if gas_station_user:
             gas_station = gas_station_user.gas_station
             gas_station.total-=1
