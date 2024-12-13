@@ -47,7 +47,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-
+            print("HI")
             gas_station_user = self.user.gas_station_users.first()
             if gas_station_user:
                 gas_station = gas_station_user.gas_station
