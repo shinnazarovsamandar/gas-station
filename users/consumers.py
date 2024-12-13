@@ -49,7 +49,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             )
             print("HI")
 
-            message, data = self.delete_gas_station_user()
+            message, data = await self.delete_gas_station_user()
             
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -192,10 +192,10 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         data = {
             "action": DELETE,
             "user": {
-                "id": str(self.user.id)
+                "id": self.user.id
             }, 
             "gas_station": {
-                "id": str(gas_station.id),
+                "id": gas_station.id,
                 "total": gas_station.total
             }
         }
