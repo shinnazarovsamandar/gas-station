@@ -92,16 +92,18 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             if serializer.is_valid():
                 try:
                     message, data = await self.create_comment(serializer.data)
+                    if message is not None:
+                        await self.channel_layer.group_send(
+                            self.room_group_name,
+                            {
+                                'type': 'chat_message',
+                                'message': create_response_body(message, data)
+                            }
+                        )
+
                 except Exception:
                     await self.close()
                     return
-                await self.channel_layer.group_send(
-                    self.room_group_name,
-                    {
-                        'type': 'chat_message',
-                        'message': create_response_body(message, data)
-                    }
-                )
 
         else:
             await self.close()
@@ -189,18 +191,19 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             gas_station.save()
             gas_station_user.delete()
 
-        message = "Gas station user deleted successfully."
-        data = {
-            "action": DELETE,
-            "user": {
-                "id": self.user.id
-            }, 
-            "gas_station": {
-                "id": gas_station.id,
-                "total": gas_station.total
+            message = "Gas station user deleted successfully."
+            data = {
+                "action": DELETE,
+                "user": {
+                    "id": self.user.id
+                }, 
+                "gas_station": {
+                    "id": gas_station.id,
+                    "total": gas_station.total
+                }
             }
-        }
-        return message, data
+            return message, data
+        return None, None
 # class GasStationAsyncWebsocketConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):
 #         self.user = self.scope.get("user")
