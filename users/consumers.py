@@ -58,7 +58,13 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             message = "Gas station user deleted successfully."
             data = {
                 "action": DELETE,
-                "id": self.user.id
+                "user": {
+                    "id": self.user.id
+                }, 
+                "gas_station": {
+                    "id": gas_station.id,
+                    "total": gas_station.total
+                }
             }
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -173,7 +179,8 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         message = "Gas station comment updated successfully."
         data = {
             "id": id,
-            'comment': comment
+            'comment': comment, 
+            "updated_at": updated_at
         }
         return message, data
     @database_sync_to_async
