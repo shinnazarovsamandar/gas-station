@@ -184,7 +184,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         data = {
             "id": id,
             'comment': comment, 
-            "updated_at": updated_at
+            "updated_at": updated_at.isoformat()
         }
         return message, data
     
