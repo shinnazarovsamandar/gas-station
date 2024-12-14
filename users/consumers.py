@@ -140,11 +140,11 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 if distance <= int(env('DISTANCE')) and distance <= min_distance:
                     min_distance = distance
                     closest_gas_station = gas_station
-            gas_station_user = self.user.gas_station_users
-            if gas_station_user:
+            gas_station_user_ = self.user.gas_station_users
+            if gas_station_user_:
                 serializer = UserPointModelSerializer(self.user)
                 gas_station = None
-                gas_station_user = gas_station_user.filter(gas_station=closest_gas_station).first()
+                gas_station_user = gas_station_user_.filter(gas_station=closest_gas_station).first()
                 if not gas_station_user:
                     gas_station = gas_station_user.gas_station
                     gas_station.total-=1
@@ -154,6 +154,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                         'id': str(gas_station.id),
                         'total': gas_station.total
                     }
+                    gas_station_user_.delete()
 
                 message = "Gas Station user updated successfully."
                 data = {
