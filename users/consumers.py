@@ -169,6 +169,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         gas_station.save()
         message = "Gas station comment updated successfully."
         data = {
+            'action': COMMENT,
             "id": id,
             'comment': comment, 
             "updated_at": updated_at.isoformat()
