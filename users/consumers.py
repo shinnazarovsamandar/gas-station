@@ -135,7 +135,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         gas_stations = GasStationModel.objects.all()
         for gas_station in gas_stations:
             distance = geopy_distance(point, gas_station.point).meters
-            print(distance)
+            print(self.user.name, distance)
             if distance <= int(env('DISTANCE')):
                 gas_station_user = self.user.gas_station_users.filter(gas_station=gas_station).first()
                 if gas_station_user is not None:
