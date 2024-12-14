@@ -148,7 +148,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                     gas_station = None
                     gas_station_user = gas_station_user_.filter(gas_station=closest_gas_station).first()
                     if not gas_station_user:
-                        gas_station = gas_station_user_.gas_station
+                        gas_station = gas_station_user_.first().gas_station
                         gas_station.total-=1
                         gas_station.save()
 
