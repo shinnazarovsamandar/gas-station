@@ -77,7 +77,8 @@ class VerifyCreateAPIView(generics.CreateAPIView):
         data = {
             "access": str(access),
             "refresh": str(refresh),
-            "is_signed_up": user.is_signed_up
+            "is_signed_up": user.is_signed_up,
+            "id": user.id
         }
         headers = self.get_success_headers(serializer.data)
         return Response(create_response_body("Code verified successfully.", data), headers=headers)
