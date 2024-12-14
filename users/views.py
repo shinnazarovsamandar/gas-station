@@ -135,3 +135,11 @@ class TokenCreateAPIView(generics.CreateAPIView):
 class SignOutAPIView(generics.CreateAPIView):
     permission_classes = ()
 
+class DeleteDestroyAPIView(generics.DestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+
+    def delete(self, request, *args, **kwargs):
+        user = self.request.user
+        user.delete()
+        return Response(create_response_body("User deleted successfully."))
+

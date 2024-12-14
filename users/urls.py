@@ -2,7 +2,7 @@ from django.urls import path ,include
 
 from .views import (AuthCreateAPIView, VerifyCreateAPIView,
                     SignOutAPIView, UserDetailsUpdateAPIView,
-                    TokenCreateAPIView,)
+                    TokenCreateAPIView, DeleteDestroyAPIView)
 
 urlpatterns = [
     path("auth/", include([
@@ -12,4 +12,5 @@ urlpatterns = [
         path("token/", TokenCreateAPIView.as_view(), name="token"),
         # path("sign-out/", SignOutAPIView.as_view(), name="signout")
     ])),
+    path("delete/", DeleteDestroyAPIView.as_view(), name="delete"),
 ]
