@@ -142,8 +142,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                     min_distance = distance
                     closest_gas_station = gas_station
             if closest_gas_station is not None:
-                gas_station_user_ = self.user.gas_station_users
-                print(gas_station_user_, "Hiii")
+                gas_station_user_ = self.user.gas_station_users.all()
                 if gas_station_user_:
                     print("HI")
                     serializer = UserPointModelSerializer(self.user)
