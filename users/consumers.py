@@ -145,6 +145,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 gas_station_user_ = self.user.gas_station_users
                 print(gas_station_user_, "Hiii")
                 if gas_station_user_:
+                    print("HI")
                     serializer = UserPointModelSerializer(self.user)
                     gas_station = None
                     gas_station_user = gas_station_user_.filter(gas_station=closest_gas_station).first()
