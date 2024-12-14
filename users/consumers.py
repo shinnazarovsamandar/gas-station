@@ -131,34 +131,51 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         self.user.point = point
         self.user.save()
         # point = point.transform(3857)
-        print(point.srid)
         gas_stations = GasStationModel.objects.all()
-        for gas_station in gas_stations:
-            distance = geopy_distance(point, gas_station.point).meters
-            print(self.user.name, distance)
-            if distance <= int(env('DISTANCE')):
-                gas_station_user = self.user.gas_station_users.filter(gas_station=gas_station).first()
-                if gas_station_user is not None:
-                    serializer = UserPointModelSerializer(self.user)
-                    message = "Gas Station user updated successfully."
-                    data = {
-                        "action": UPDATE,
-                        "user": serializer.data
-                    }
-                else:
-                    GasStationUserModel.objects.create(gas_station=gas_station, user=self.user)
-                    gas_station.total+=1
+        min_distance = float('inf')
+        if gas_stations:
+            for gas_station in gas_stations:
+                distance = geopy_distance(point, gas_station.point).meters
+                print(self.user.name, distance)
+                if distance <= int(env('DISTANCE')) and distance <= min_distance:
+                    min_distance = distance
+                    closest_gas_station = gas_station
+            gas_station_user = self.user.gas_station_users
+            if gas_station_user:
+                serializer = UserPointModelSerializer(self.user)
+                gas_station = None
+                gas_station_user = gas_station_user.filter(gas_station=closest_gas_station).first()
+                if not gas_station_user:
+                    gas_station = gas_station_user.gas_station
+                    gas_station.total-=1
                     gas_station.save()
-                    serializer = UserDetailsModelSerializer(self.user)
-                    serializer_gt = GasStationModelSerializer(gas_station)
-                    message = "Gas Station user created successfully."
-                    data = {
-                        "action": CREATE,
-                        "user": serializer.data,
-                        "gas_station": serializer_gt.data
+
+                    gas_station = {
+                        'id': str(gas_station.id),
+                        'total': gas_station.total
                     }
 
-                return message, data
+                message = "Gas Station user updated successfully."
+                data = {
+                    'action': UPDATE,
+                    'user': serializer.data,
+                    'gas_station': gas_station
+                }
+            else:
+                GasStationUserModel.objects.create(gas_station=closest_gas_station, user=self.user)
+                closest_gas_station.total += 1
+                closest_gas_station.save()
+                serializer = UserDetailsModelSerializer(self.user)
+                serializer_gt = GasStationModelSerializer(closest_gas_station)
+                message = "Gas Station user created successfully."
+
+                data = {
+                    "action": CREATE,
+                    "user": serializer.data,
+                    "gas_station": serializer_gt.data
+                }
+
+            return message, data
         return None, None
 
     @database_sync_to_async
