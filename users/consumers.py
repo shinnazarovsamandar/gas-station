@@ -5,7 +5,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from urllib.parse import parse_qs
 from django.contrib.gis.geos import Point
 from django.utils import timezone
-from geopy.distance import distance
+from geopy.distance import distance as geopy_distance
 
 
 from config.utils import create_response_body
@@ -134,7 +134,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         # print(point)
         gas_stations = GasStationModel.objects.all()
         for gas_station in gas_stations:
-            distance = distance(point, gas_station.point)
+            distance = geopy_distance(point, gas_station.point).meters
             print(distance)
             if distance <= int(env('DISTANCE')):
                 gas_station_user = self.user.gas_station_users.filter(gas_station=gas_station).first()
