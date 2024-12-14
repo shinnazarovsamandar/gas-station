@@ -143,6 +143,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                     closest_gas_station = gas_station
             if closest_gas_station is not None:
                 gas_station_user_ = self.user.gas_station_users
+                print(gas_station_user_)
                 if gas_station_user_:
                     serializer = UserPointModelSerializer(self.user)
                     gas_station = None
