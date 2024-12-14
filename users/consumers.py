@@ -127,11 +127,11 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def create_point(self, data):
         point = data['point']
-        point = Point(list(map(float, point)), srid=4326)
+        point = Point(list(map(float, point)))
         self.user.point = point
         self.user.save()
         # point = point.transform(3857)
-        # print(point)
+        print(point.srid)
         gas_stations = GasStationModel.objects.all()
         for gas_station in gas_stations:
             distance = geopy_distance(point, gas_station.point).meters
