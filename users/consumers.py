@@ -129,10 +129,11 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         point = Point(list(map(float, point)))
         self.user.point = point
         self.user.save()
-
+        point = point.transform(3857)
         gas_stations = GasStationModel.objects.all()
         for gas_station in gas_stations:
-            distance = gas_station.point.transform(3857).distance(point.transform(3857))
+            gas_station_point = gas_station.point.transform(3857)
+            distance = gas_station_point.distance(point)
             print(distance)
             if distance <= int(env('DISTANCE')):
                 gas_station_user = self.user.gas_station_users.filter(gas_station=gas_station).first()
