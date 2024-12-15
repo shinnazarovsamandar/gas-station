@@ -50,7 +50,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             )
             print("HI")
 
-            message, data = await self.delete_gas_station_user()
+            message, data = await database_sync_to_async(self.delete_gas_station_user)()
             if message is not None:
                 await self.channel_layer.group_send(
                     self.room_group_name,
@@ -75,7 +75,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             data = text_data_json['data']
             serializer = PointSerializer(data=data)
             if serializer.is_valid():
-                message, data = await self.create_point(serializer.data)
+                message, data, delete = await self.create_point(serializer.data)
                 if message is not None:
                     await self.channel_layer.group_send(
                         self.room_group_name,
@@ -84,6 +84,15 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                             'message': create_response_body(message, data)
                         }
                     )
+                if delete is not None:
+                    await self.channel_layer.group_send(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_message',
+                            'message': create_response_body(message, data)
+                        }
+                    )
+
             else:
                 await self.close()
                 return
@@ -188,8 +197,11 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                         "gas_station": serializer_gt.data
                     }
 
-                return message, data
-            return None, None
+                return message, data, None
+            message, data = self.delete_gas_station_user()
+            if message is not None:
+                return None, None, True
+            return None, None, None
 
     @database_sync_to_async
     def create_comment(self, data):
@@ -215,7 +227,6 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
         serializer = GasStationUserModelSerializer(gas_stations, many=True)
         return serializer.data
 
-    @database_sync_to_async
     def delete_gas_station_user(self):
         gas_station_user = self.user.gas_station_users.first()
         if gas_station_user:
