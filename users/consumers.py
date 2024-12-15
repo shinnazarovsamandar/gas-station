@@ -84,14 +84,15 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                             'message': create_response_body(message, data)
                         }
                     )
-                if delete_message is not None:
-                    await self.channel_layer.group_send(
-                        self.room_group_name,
-                        {
-                            'type': 'chat_message',
-                            'message': create_response_body(delete_message, delete_data)
-                        }
-                    )
+                else:
+                    if delete_message is not None:
+                        await self.channel_layer.group_send(
+                            self.room_group_name,
+                            {
+                                'type': 'chat_message',
+                                'message': create_response_body(delete_message, delete_data)
+                            }
+                        )
 
             else:
                 await self.close()
