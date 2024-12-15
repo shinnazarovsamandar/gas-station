@@ -76,20 +76,20 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             serializer = PointSerializer(data=data)
             if serializer.is_valid():
                 message, data, delete_message, delete_data = await self.create_point(serializer.data)
+                if message is not None:
+                    await self.channel_layer.group_send(
+                        self.room_group_name,
+                        {
+                            'type': 'chat_message',
+                            'message': create_response_body(message, data)
+                        }
+                    )
                 if delete_message is not None:
                     await self.channel_layer.group_send(
                         self.room_group_name,
                         {
                             'type': 'chat_message',
                             'message': create_response_body(delete_message, delete_data)
-                        }
-                    )
-                if delete is not None:
-                    await self.channel_layer.group_send(
-                        self.room_group_name,
-                        {
-                            'type': 'chat_message',
-                            'message': create_response_body(message, data)
                         }
                     )
 
