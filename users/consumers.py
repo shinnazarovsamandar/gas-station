@@ -152,7 +152,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                         gas_station = gas_station_user_.first().gas_station
                         gas_station.total-=1
                         gas_station.save()
-
+                        gas_station_user_.delete()
                         GasStationUserModel.objects.create(gas_station=closest_gas_station, user=self.user)
                         closest_gas_station.total += 1
                         closest_gas_station.save()
@@ -167,7 +167,6 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                                 'total': closest_gas_station.total
                             }
                         }
-                        gas_station_user_.delete()
 
                     message = "Gas Station user updated successfully."
                     data = {
