@@ -197,11 +197,11 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                         "gas_station": serializer_gt.data
                     }
 
-                return message, data, None
+                return message, data, None, None
             message, data = self.delete_gas_station_user()
             if message is not None:
-                return None, None, True
-            return None, None, None
+                return None, None, message, data
+            return None, None, None, None
 
     @database_sync_to_async
     def create_comment(self, data):
