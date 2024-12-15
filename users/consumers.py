@@ -153,9 +153,19 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                         gas_station.total-=1
                         gas_station.save()
 
+                        GasStationUserModel.objects.create(gas_station=closest_gas_station, user=self.user)
+                        closest_gas_station.total += 1
+                        closest_gas_station.save()
+
                         gas_station = {
-                            'id': str(gas_station.id),
-                            'total': gas_station.total
+                            DELETE: {
+                                'id': str(gas_station.id),
+                                'total': gas_station.total
+                            },
+                            UPDATE: {
+                                'id': str(closest_gas_station.id),
+                                'total': closest_gas_station.total
+                            }
                         }
                         gas_station_user_.delete()
 
