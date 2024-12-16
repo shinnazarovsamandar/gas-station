@@ -36,7 +36,7 @@ class UserPointModelSerializer(serializers.ModelSerializer):
 class GasStationModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = GasStationModel
-        fields = ['id', 'total']
+        fields = ['id', 'total', 'is_open']
 
 class _GasStationUserModelSerializer(serializers.ModelSerializer):
     user = UserPointModelSerializer()
@@ -47,7 +47,7 @@ class GasStationUserModelSerializer(serializers.ModelSerializer):
     gas_station_users = _GasStationUserModelSerializer(many=True)
     class Meta:
         model = GasStationModel
-        fields = ['id', 'name', 'point', 'total', 'comment', 'comment_updated_at', 'gas_station_users']
+        fields = ['id', 'name', 'point', 'total', 'is_open', 'is_open_by_admin', 'comment', 'comment_updated_at', 'gas_station_users']
 
 class GasStationCommentModelSerializer(serializers.Serializer):
     id = serializers.UUIDField()

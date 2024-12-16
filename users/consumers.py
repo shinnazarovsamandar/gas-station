@@ -154,7 +154,6 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             if closest_gas_station is not None:
                 gas_station_user_ = self.user.gas_station_users.all()
                 if gas_station_user_:
-                    print("HI")
                     serializer = UserPointModelSerializer(self.user)
                     gas_station = None
                     gas_station_user = gas_station_user_.filter(gas_station=closest_gas_station).first()
@@ -167,14 +166,28 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                         closest_gas_station.total += 1
                         closest_gas_station.save()
 
+                        if gas_station.total:
+                            pass
+                        if closest_gas_station.total:
+                            pass
+                        if gas_station.is_open == False and gas_station.total > env('TOTAL'):
+                            gas_station.is_open = True
+                            gas_station.save()
+
+                        if closest_gas_station.is_open == False and closest_gas_station.total > env('TOTAL'):
+                            closest_gas_station.is_open = True
+                            closest_gas_station.save()
+
                         gas_station = {
                             DELETE: {
                                 'id': str(gas_station.id),
-                                'total': gas_station.total
+                                'total': gas_station.total,
+                                'is_open': gas_station.is_open,
                             },
                             UPDATE: {
                                 'id': str(closest_gas_station.id),
-                                'total': closest_gas_station.total
+                                'total': closest_gas_station.total,
+                                'is_open': closest_gas_station.is_open,
                             }
                         }
 
@@ -188,6 +201,10 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                     GasStationUserModel.objects.create(gas_station=closest_gas_station, user=self.user)
                     closest_gas_station.total += 1
                     closest_gas_station.save()
+                    if closest_gas_station.is_open == False and closest_gas_station.total > env('TOTAL'):
+                        closest_gas_station.is_open = True
+                        closest_gas_station.save()
+
                     serializer = UserDetailsModelSerializer(self.user)
                     serializer_gt = GasStationModelSerializer(closest_gas_station)
                     message = "Gas Station user created successfully."
@@ -235,7 +252,9 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             gas_station.total-=1
             gas_station.save()
             gas_station_user.delete()
-
+            if gas_station.is_open and gas_station.total <= env('TOTAL'):
+                gas_station.is_open = False
+                gas_station.save()
             message = "Gas station user deleted successfully."
             data = {
                 "action": DELETE,
@@ -244,7 +263,8 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 }, 
                 "gas_station": {
                     "id": str(gas_station.id),
-                    "total": gas_station.total
+                    "total": gas_station.total,
+                    'is_open': gas_station.is_open
                 }
             }
             return message, data
