@@ -170,11 +170,11 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                             pass
                         if closest_gas_station.total:
                             pass
-                        if gas_station.is_open == False and gas_station.total > env('TOTAL'):
+                        if gas_station.is_open == False and gas_station.total > int(env('TOTAL')):
                             gas_station.is_open = True
                             gas_station.save()
 
-                        if closest_gas_station.is_open == False and closest_gas_station.total > env('TOTAL'):
+                        if closest_gas_station.is_open == False and closest_gas_station.total > int(env('TOTAL')):
                             closest_gas_station.is_open = True
                             closest_gas_station.save()
 
@@ -201,7 +201,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                     GasStationUserModel.objects.create(gas_station=closest_gas_station, user=self.user)
                     closest_gas_station.total += 1
                     closest_gas_station.save()
-                    if closest_gas_station.is_open == False and closest_gas_station.total > env('TOTAL'):
+                    if closest_gas_station.is_open == False and closest_gas_station.total > int(env('TOTAL')):
                         closest_gas_station.is_open = True
                         closest_gas_station.save()
 
@@ -252,7 +252,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             gas_station.total-=1
             gas_station.save()
             gas_station_user.delete()
-            if gas_station.is_open and gas_station.total <= env('TOTAL'):
+            if gas_station.is_open and gas_station.total <= int(env('TOTAL')):
                 gas_station.is_open = False
                 gas_station.save()
             message = "Gas station user deleted successfully."
