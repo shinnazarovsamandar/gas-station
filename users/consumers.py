@@ -33,14 +33,6 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
-        data = await self.get_gas_stations()
-        data = {
-            "action": LIST,
-            "gas_stations": data
-        }
-        await self.send(text_data=json.dumps(
-            create_response_body("Gas stations retrieved successfully.", data = data)
-        ))
 
     async def disconnect(self, close_code):
         if close_code != 1006:
@@ -115,7 +107,15 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 except Exception:
                     await self.close()
                     return
-
+        elif action == LIST:
+            data = await self.get_gas_stations()
+            data = {
+                "action": LIST,
+                "gas_stations": data
+            }
+            await self.send(text_data=json.dumps(
+                create_response_body("Gas stations retrieved successfully.", data = data)
+            ))
         else:
             await self.close()
             return
