@@ -7,3 +7,9 @@ class GasStationGeoFeatureModelSerializer(serializers.GeoFeatureModelSerializer)
         geo_field = 'point'
         fields = ['id', 'name', 'point']
         read_only_fields = ['id']
+
+class _GasStationGeoFeatureModelSerializer(serializers.GeoFeatureModelSerializer):
+    class Meta:
+        model = GasStationModel
+        geo_field = 'point'
+        fields = '__all__'
