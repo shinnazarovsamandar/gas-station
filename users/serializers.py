@@ -65,5 +65,6 @@ class GasStationCommentModelSerializer(serializers.Serializer):
     comment = serializers.CharField(max_length=255)
 
 class DisconnectSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    
+    class Meta:
+        model = UserModel
+        fields = ['id']
