@@ -34,8 +34,7 @@ def get_user(phone_number, type):
     user = UserModel.objects.get(phone_number=phone_number, type=type)
     return user
 
-def delete_gas_station_user(id):
-    user = UserModel.objects.get(id=id)
+def delete_gas_station_user(user):
     gas_station_user = user.gas_station_users.first()
     if gas_station_user:
         gas_station = gas_station_user.gas_station

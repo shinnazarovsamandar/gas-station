@@ -148,14 +148,14 @@ class DeleteDestroyAPIView(generics.DestroyAPIView):
         return Response(create_response_body("User deleted successfully."))
 
 class DisconnectAPIView(generics.CreateAPIView):
-    serializer_class = (DisconnectSerializer,)
+    permission_classes = (IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        id = serializer.validated_data['id']
+        user = request.user
         try:
-            message, data = delete_gas_station_user(id)
+            message, data = delete_gas_station_user(user)
             if message is not None:
                 channel_layer = get_channel_layer()
                 group_name = "chat_gas_stations"
