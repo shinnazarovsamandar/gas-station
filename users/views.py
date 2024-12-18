@@ -147,29 +147,26 @@ class DeleteDestroyAPIView(generics.DestroyAPIView):
         user.delete()
         return Response(create_response_body("User deleted successfully."))
 
-class DisconnectAPIView(generics.CreateAPIView):
+
+from rest_framework.views import APIView
+
+class DisconnectAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    def post(self, request, *args, **kwargs):
         user = request.user
-        try:
-            message, data = delete_gas_station_user(user)
-            if message is not None:
-                channel_layer = get_channel_layer()
-                group_name = "chat_gas_stations"
+        message, data = delete_gas_station_user(user)
+        if message is not None:
+            channel_layer = get_channel_layer()
+            group_name = "chat_gas_stations"
 
-                async_to_sync(channel_layer.group_send)(
-                    group_name,
-                    {
-                        "type": "chat_message",
-                        "data": data
-                    }
-                )
-            headers = self.get_success_headers(serializer.data)
+            async_to_sync(channel_layer.group_send)(
+                group_name,
+                {
+                    "type": "chat_message",
+                    "data": data
+                }
+            )
 
-            return Response(create_response_body("Disconnect user successfully.", data), headers=headers)
-        except Exception:
-            return Response(create_response_body("Invalid id."), status=status.HTTP_400_BAD_REQUEST)
 
+        return Response(create_response_body("Disconnect user successfully."))
