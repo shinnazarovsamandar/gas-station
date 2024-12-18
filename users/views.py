@@ -7,16 +7,19 @@ from rest_framework_simplejwt.exceptions import TokenError
 
 from django.core.cache import cache
 from django.utils import timezone
-
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 from .serializers import (SignUpModelSerializer, VerifyModelSerializer,
-                          UserDetailsModelSerializer, TokenModelSerializer)
+                          UserDetailsModelSerializer, TokenModelSerializer,
+                          DisconnectSerializer,)
 from .tasks import send_sms_task
 from .utils import generate_code, get_user
 
 from .constants import USER
 from .models import UserModel
 from config.utils import create_response_body
+from .utils import delete_gas_station_user
 from admins.models import GasStationModel
 # Create your views here.
 
@@ -143,4 +146,30 @@ class DeleteDestroyAPIView(generics.DestroyAPIView):
         user = self.request.user
         user.delete()
         return Response(create_response_body("User deleted successfully."))
+
+class DisconnectAPIView(generics.CreateAPIView):
+    serializer_class = (DisconnectSerializer,)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        id = serializer.validated_data['id']
+        try:
+            message, data = delete_gas_station_user(id)
+            if message is not None:
+                channel_layer = get_channel_layer()
+                group_name = "chat_gas_stations"
+
+                async_to_sync(channel_layer.group_send)(
+                    group_name,
+                    {
+                        "type": "chat_message",
+                        "data": data
+                    }
+                )
+            headers = self.get_success_headers(serializer.data)
+
+            return Response(create_response_body("Disconnect user successfully.", data), headers=headers)
+        except Exception:
+            return Response(create_response_body("Invalid id."), status=status.HTTP_400_BAD_REQUEST)
 
