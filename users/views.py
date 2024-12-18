@@ -21,6 +21,7 @@ from .models import UserModel
 from config.utils import create_response_body
 from .utils import delete_gas_station_user
 from admins.models import GasStationModel
+from config.settings import env
 # Create your views here.
 
 class AuthCreateAPIView(generics.CreateAPIView):
@@ -170,3 +171,13 @@ class DisconnectAPIView(APIView):
 
 
         return Response(create_response_body("Disconnect user successfully."))
+
+class VersionAPIView(APIView):
+
+    def get(self, request, *args, **kwargs):
+
+        data = {
+            "version": env("VERSION")
+        }
+        return Response(create_response_body("Version retreived successfully.", data))
+
