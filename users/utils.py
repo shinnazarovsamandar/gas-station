@@ -5,7 +5,7 @@ from eskiz.exception.token import TokenExpired
 
 from config.settings import env
 from .models import UserModel
-
+from .constants import DELETE
 
 def send_sms(phone_number, code):
     eskiz_client = ClientSync(
@@ -48,7 +48,7 @@ def delete_gas_station_user(user):
         data = {
             "action": DELETE,
             "user": {
-                "id": str(self.user.id)
+                "id": str(user.id)
             },
             "gas_station": {
                 "id": str(gas_station.id),
