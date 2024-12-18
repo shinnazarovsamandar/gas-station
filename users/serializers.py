@@ -3,6 +3,8 @@ from rest_framework import serializers
 from .models import UserModel, GasStationUserModel
 from admins.models import GasStationModel
 # from .constants import CREATE
+from django.core.validators import RegexValidator
+
 
 
 class SignUpModelSerializer(serializers.ModelSerializer):
@@ -17,6 +19,15 @@ class VerifyModelSerializer(serializers.ModelSerializer):
         fields = ['phone_number', 'code']
 
 class UserDetailsModelSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        max_length=50,
+        validators=[
+            RegexValidator(
+                regex=r"^[a-zA-Zа-яА-ЯёЁ]+$",
+                message="The name field must only contain letters without spaces."
+            )
+        ]
+    )
     class Meta:
         model = UserModel
         fields = ['id', 'name', 'number', 'point']
