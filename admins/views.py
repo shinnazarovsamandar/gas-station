@@ -26,7 +26,7 @@ class GasStationListAPIView(generics.ListAPIView):
     # permission_classes = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().order_by("-created_at")
         serializer = self.get_serializer(queryset, many=True)
 
         data = {
