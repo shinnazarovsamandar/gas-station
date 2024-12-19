@@ -147,7 +147,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
             closest_gas_station = None
             for gas_station in gas_stations:
                 distance = geopy_distance(point, gas_station.point).meters
-                print(self.user.name, distance)
+                print(self.user.name, self.user.phone_number, distance)
                 if distance <= int(env('DISTANCE')) and distance <= min_distance:
                     min_distance = distance
                     closest_gas_station = gas_station
