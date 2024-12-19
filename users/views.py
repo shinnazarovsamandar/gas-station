@@ -35,6 +35,7 @@ class AuthCreateAPIView(generics.CreateAPIView):
         # code = generate_code()
         #
         # timeout, key, value = 60, f"user_{phone_number}_{code}", {}
+        timeout = 60
         timestamp = int(timezone.now().timestamp()) + timeout
         #
         # #save code to cache
