@@ -206,6 +206,6 @@ CRONJOBS = [
 CELERY_BEAT_SCHEDULE = {
     'run-my-cron-job-every-10-seconds': {
         'task': 'users.tasks.my_cron_job',
-        'schedule': 20.0,  # Every 10 seconds
+        'schedule': float(env('SCHEDULE')),  # Every 10 seconds
     },
 }

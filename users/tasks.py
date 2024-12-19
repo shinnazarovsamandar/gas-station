@@ -3,10 +3,10 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.utils import timezone
 from datetime import timedelta
+from config.settings import env
 
 from .utils import send_sms, delete_gas_station_user
-import logging
-logger = logging.getLogger('my_custom_logger')
+
 
 from users.models import UserModel
 @shared_task
@@ -16,12 +16,9 @@ def send_sms_task(phone_number, code):
 
 @shared_task
 def my_cron_job():
-    # print("Samandar")
-
-    logger.info('Task started successfully.')
     users = UserModel.objects.all()
     for user in users:
-        if user.updated_at + timedelta(minutes=1) < timezone.now():
+        if user.updated_at + timedelta(minutes=int(env('TIMEDELTA'))) < timezone.now():
             message, data = delete_gas_station_user(user)
             if message is not None:
                 channel_layer = get_channel_layer()
@@ -34,4 +31,3 @@ def my_cron_job():
                         "message": data
                     }
                 )
-    return "Samandar"
