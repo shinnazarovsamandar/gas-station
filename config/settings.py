@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework_gis',
     'corsheaders',
+    'django_celery_beat',
+    'django_cron',
 
     #custom apps
     'users',
@@ -194,3 +196,7 @@ CHANNEL_LAYERS = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+CRONJOBS = [
+    ('* * * * *', 'users.cron.MyCronJob.do')  # Runs every minute
+]
