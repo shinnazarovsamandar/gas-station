@@ -40,7 +40,6 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-            print("HI")
 
             message, data = await database_sync_to_async(self.delete_gas_station_user)()
             if message is not None:
@@ -157,7 +156,7 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                     serializer = UserPointModelSerializer(self.user)
                     gas_station = None
                     gas_station_user = gas_station_user_.filter(gas_station=closest_gas_station).first()
-                    if not gas_station_user:
+                    if gas_station_user is None:
                         gas_station = gas_station_user_.first().gas_station
                         gas_station.total-=1
                         gas_station.save()
@@ -166,12 +165,8 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                         closest_gas_station.total += 1
                         closest_gas_station.save()
 
-                        if gas_station.total:
-                            pass
-                        if closest_gas_station.total:
-                            pass
-                        if gas_station.is_open == False and gas_station.total > int(env('TOTAL')):
-                            gas_station.is_open = True
+                        if gas_station.is_open and gas_station.total == int(env('TOTAL')):
+                            gas_station.is_open = False
                             gas_station.save()
 
                         if closest_gas_station.is_open == False and closest_gas_station.total > int(env('TOTAL')):
@@ -214,12 +209,10 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
                         "user": serializer.data,
                         "gas_station": serializer_gt.data
                     }
-                print("Hi")
+
                 return message, data, None, None
             message, data = self.delete_gas_station_user()
-            print("CHi")
             if message is not None:
-                print("Si")
                 return None, None, message, data
         return None, None, None, None
 
@@ -249,12 +242,12 @@ class GasStationsAsyncWebsocketConsumer(AsyncWebsocketConsumer):
 
     def delete_gas_station_user(self):
         gas_station_user = self.user.gas_station_users.first()
-        if gas_station_user:
+        if gas_station_user is not None:
             gas_station = gas_station_user.gas_station
             gas_station.total-=1
             gas_station.save()
             gas_station_user.delete()
-            if gas_station.is_open and gas_station.total <= int(env('TOTAL')):
+            if gas_station.is_open and gas_station.total == int(env('TOTAL')):
                 gas_station.is_open = False
                 gas_station.save()
             message = "Gas station user deleted successfully."
