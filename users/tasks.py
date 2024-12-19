@@ -5,16 +5,23 @@ from django.utils import timezone
 from datetime import timedelta
 
 from .utils import send_sms, delete_gas_station_user
+import logging
+logger = logging.getLogger('my_custom_logger')
+
 from users.models import UserModel
 @shared_task
 def send_sms_task(phone_number, code):
     send_sms(phone_number, code)
     return "success"
 
+@shared_task
 def my_cron_job():
+    # print("Samandar")
+
+    logger.info('Task started successfully.')
     users = UserModel.objects.all()
     for user in users:
-        if user.updated_at < timezone.now() - timedelta(minutes=1):
+        if user.updated_at + timedelta(minutes=1) < timezone.now():
             message, data = delete_gas_station_user(user)
             if message is not None:
                 channel_layer = get_channel_layer()
@@ -27,3 +34,4 @@ def my_cron_job():
                         "message": data
                     }
                 )
+    return "Samandar"
