@@ -165,7 +165,7 @@ class DisconnectAPIView(APIView):
                 group_name,
                 {
                     "type": "chat_message",
-                    "data": data
+                    "message": data
                 }
             )
 

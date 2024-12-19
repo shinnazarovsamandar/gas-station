@@ -12,4 +12,4 @@ class _GasStationGeoFeatureModelSerializer(serializers.GeoFeatureModelSerializer
     class Meta:
         model = GasStationModel
         geo_field = 'point'
-        fields = '__all__'
+        fields = ['name', 'point']
