@@ -58,3 +58,30 @@ def delete_gas_station_user(user):
         }
         return message, data
     return None, None
+
+# def _delete_gas_station_user(user):
+#     gas_station_user = user.gas_station_users.first()
+#
+#     if gas_station_user:
+#         if gas_station_user.up
+#         gas_station = gas_station_user.gas_station
+#         gas_station.total-=1
+#         gas_station.save()
+#         gas_station_user.delete()
+#         if gas_station.is_open and gas_station.total <= int(env('TOTAL')):
+#             gas_station.is_open = False
+#             gas_station.save()
+#         message = "Gas station user deleted successfully."
+#         data = {
+#             "action": DELETE,
+#             "user": {
+#                 "id": str(user.id)
+#             },
+#             "gas_station": {
+#                 "id": str(gas_station.id),
+#                 "total": gas_station.total,
+#                 'is_open': gas_station.is_open
+#             }
+#         }
+#         return message, data
+#     return None, None

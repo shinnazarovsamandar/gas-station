@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'rest_framework_gis',
     'corsheaders',
     'django_celery_beat',
-    'django_cron',
+    # 'django_cron',
+    'django_crontab',
 
     #custom apps
     'users',
@@ -198,5 +199,13 @@ CHANNEL_LAYERS = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 CRONJOBS = [
-    ('* * * * *', 'users.cron.MyCronJob.do')  # Runs every minute
+    ('*/5 * * * *', 'users.tasks.my_cron_job'),
+    # Add more cron jobs as needed
 ]
+
+CELERY_BEAT_SCHEDULE = {
+    'run-my-cron-job-every-10-seconds': {
+        'task': 'users.tasks.my_cron_job',
+        'schedule': 3600.0,  # Every 10 seconds
+    },
+}
