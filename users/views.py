@@ -32,17 +32,17 @@ class AuthCreateAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         phone_number = serializer.validated_data['phone_number']
-        code = generate_code()
-
-        timeout, key, value = 60, f"user_{phone_number}_{code}", {}
+        # code = generate_code()
+        #
+        # timeout, key, value = 60, f"user_{phone_number}_{code}", {}
         timestamp = int(timezone.now().timestamp()) + timeout
-
-        #save code to cache
-        cache.set(key, value, timeout)
-
-        #send sms
-        send_sms_task.delay(phone_number, code)
-
+        #
+        # #save code to cache
+        # cache.set(key, value, timeout)
+        #
+        # #send sms
+        # send_sms_task.delay(phone_number, code)
+        #
         data = {
             "timestamp": timestamp,
         }
@@ -59,16 +59,16 @@ class VerifyCreateAPIView(generics.CreateAPIView):
 
         #verify code
         phone_number = serializer.validated_data['phone_number']
-        code = serializer.validated_data['code']
-
-        key = f"user_{phone_number}_{code}"
-
-        get_key = cache.get(key)
-
-        if get_key is None:
-            return Response(create_response_body("Invalid code."), status=status.HTTP_400_BAD_REQUEST)
-
-        cache.delete(key)
+        # code = serializer.validated_data['code']
+        #
+        # key = f"user_{phone_number}_{code}"
+        #
+        # get_key = cache.get(key)
+        #
+        # if get_key is None:
+        #     return Response(create_response_body("Invalid code."), status=status.HTTP_400_BAD_REQUEST)
+        #
+        # cache.delete(key)
 
         try:
             user = get_user(phone_number, USER)
@@ -93,7 +93,7 @@ class UserDetailsUpdateAPIView(generics.UpdateAPIView):
     http_method_names = ['put']
 
 
-    
+
 
     def perform_update(self, serializer):
         user = serializer.instance
