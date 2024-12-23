@@ -1,6 +1,8 @@
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.tokens import AccessToken, TokenError
+from urllib.parse import parse_qs
+
 from users.models import UserModel
 
 @database_sync_to_async
@@ -19,6 +21,9 @@ class JWTAuthMiddleware:
     async def __call__(self, scope, receive, send):
         headers = dict(scope['headers'])
         token = headers.get(b'authorization').decode()
+        if token is None:
+            parsed_query_string = parse_qs(scope["query_string"].decode())
+            token = parsed_query_string.get("token", [None])[0]
 
         if token:
             try:
