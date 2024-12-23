@@ -20,10 +20,13 @@ class JWTAuthMiddleware:
 
     async def __call__(self, scope, receive, send):
         headers = dict(scope['headers'])
-        token = headers.get(b'authorization').decode()
+        token = headers.get(b'authorization')
         if token is None:
             parsed_query_string = parse_qs(scope["query_string"].decode())
             token = parsed_query_string.get("token", [None])[0]
+        else:
+            token = token.decode()
+
 
         if token:
             try:
